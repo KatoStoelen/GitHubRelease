@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <LangVersion>8.0</LangVersion>
+    <IsPackable>true</IsPackable>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>KatoStoelen.GitHubRelease.Tool</PackageId>
+    <PackageDescription>Dotnet global tool for KatoStoelen.GitHubRelease</PackageDescription>
+    <PackageTags>github;release;notes;tool</PackageTags>
+    <IncludeSymbols>false</IncludeSymbols>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>githubrelease</ToolCommandName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SystemCommandLineExtensions.AutoOptions" Version="1.0.0-beta.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GitHubRelease\GitHubRelease.csproj" />
+  </ItemGroup>
+
+</Project>
