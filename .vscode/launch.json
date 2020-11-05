@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "GitHubRelease.Tool",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build_tool",
+            "program": "${workspaceFolder}/src/GitHubRelease.Tool/bin/Debug/netcoreapp3.1/GitHubRelease.Tool.dll",
+            "args": [
+                "-h"
+            ],
+            "cwd": "${workspaceFolder}/src/GitHubRelease.Tool",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "pat",
+            "description": "GitHub PAT",
+            "type": "promptString",
+            "password": true
+        }
+    ]
+}
