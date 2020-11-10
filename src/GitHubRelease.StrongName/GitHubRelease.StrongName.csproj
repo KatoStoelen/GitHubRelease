@@ -6,14 +6,20 @@
     <OutputType>library</OutputType>
     <IsPackable>true</IsPackable>
     <Nullable>enable</Nullable>
-    <SignAssembly>false</SignAssembly>
+
+    <!-- Octokit does not have a strong name -->
+    <NoWarn>$(NoWarn);CS8002</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>KatoStoelen.GitHubRelease</PackageId>
+    <PackageId>KatoStoelen.GitHubRelease.StrongName</PackageId>
     <PackageDescription>Create release notes based on closed GitHub issues and publish GitHub releases</PackageDescription>
     <PackageTags>github;release;notes</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\GitHubRelease\**\*.cs" Exclude="..\GitHubRelease\obj\**\*.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" PrivateAssets="compile" />

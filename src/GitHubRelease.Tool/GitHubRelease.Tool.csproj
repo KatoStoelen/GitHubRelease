@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GitHubRelease\GitHubRelease.csproj" />
+    <ProjectReference Include="..\GitHubRelease.StrongName\GitHubRelease.StrongName.csproj" />
   </ItemGroup>
 
 </Project>

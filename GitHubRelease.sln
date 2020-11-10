@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubRelease", "src\GitHub
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubRelease.Tool", "src\GitHubRelease.Tool\GitHubRelease.Tool.csproj", "{4B752334-B1D5-4A75-A3FC-C3C96C614B83}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubRelease.StrongName", "src\GitHubRelease.StrongName\GitHubRelease.StrongName.csproj", "{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,9 +48,22 @@ Global
 		{4B752334-B1D5-4A75-A3FC-C3C96C614B83}.Release|x64.Build.0 = Release|Any CPU
 		{4B752334-B1D5-4A75-A3FC-C3C96C614B83}.Release|x86.ActiveCfg = Release|Any CPU
 		{4B752334-B1D5-4A75-A3FC-C3C96C614B83}.Release|x86.Build.0 = Release|Any CPU
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}.Debug|x64.Build.0 = Debug|Any CPU
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}.Debug|x86.Build.0 = Debug|Any CPU
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}.Release|x64.ActiveCfg = Release|Any CPU
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}.Release|x64.Build.0 = Release|Any CPU
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}.Release|x86.ActiveCfg = Release|Any CPU
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CB4F12F8-75B6-4F23-A918-712C73F2CB50} = {7748F5ED-407A-431F-B2B8-EBF4EFD7834B}
 		{4B752334-B1D5-4A75-A3FC-C3C96C614B83} = {7748F5ED-407A-431F-B2B8-EBF4EFD7834B}
+		{9B5399E4-F622-4AAD-8EE7-FDAE6796D770} = {7748F5ED-407A-431F-B2B8-EBF4EFD7834B}
 	EndGlobalSection
 EndGlobal
