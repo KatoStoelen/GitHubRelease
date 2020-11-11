@@ -26,6 +26,7 @@ var _artifactsDir = _rootDir + Directory("artifacts");
 var _solutionFile = GetFiles($"{_rootDir}/*.sln").SingleOrDefault() ??
                     throw new InvalidOperationException("Did not find the solution file");
 var _nugetConfigFile = _rootDir + File("nuget.config");
+var _releaseNotesFile = _artifactsDir + File("ReleaseNotes.md");
 
 var _defaultMSBuildSettings = new DotNetCoreMSBuildSettings
 {
@@ -245,9 +246,46 @@ Task("Push")
     }
 });
 
+Task("Release-Notes")
+    .WithCriteria(!string.IsNullOrWhiteSpace(_gitHubPat), "GitHub token not set")
+    .Does(() =>
+{
+    Info($"Writing release notes to {_releaseNotesFile}");
+
+    CreateReleaseNotes(new OutputReleaseNotesSettings
+    {
+        RepositoryRootDirectory = _rootDir,
+        GitHubToken = _gitHubPat,
+        OutputFile = _releaseNotesFile
+    });
+});
+
+Task("GitHub-Release")
+    .IsDependentOn("Release-Notes")
+    .WithCriteria(_isMasterBuild, "Not on master branch")
+    .WithCriteria(!string.IsNullOrWhiteSpace(_gitHubPat), "GitHub token not set")
+    .Does(() =>
+{
+    Info($"Creating GitHub release v{_version}");
+
+    CreateGitHubRelease(new NewGitHubReleaseSettings
+    {
+        RepositoryRootDirectory = _rootDir,
+        GitHubToken = _gitHubPat,
+        Name = $"v{_version}",
+        TagName = _version,
+        TargetCommitish = GitLogTip(_rootDir).Sha,
+        BodyFile = _releaseNotesFile,
+        IsDraft = false,
+        IsPrerelease = !_isMasterBuild,
+        Assets = GetFiles($"{_artifactsDir}/*nupkg").ToList()
+    });
+});
+
 Task("CI")
     .IsDependentOn("Test")
-    .IsDependentOn("Push");
+    .IsDependentOn("Push")
+    .IsDependentOn("GitHub-Release");
 
 RunTarget(_target);
 
