@@ -25,7 +25,6 @@ var _testsDir = _rootDir + Directory("tests");
 var _artifactsDir = _rootDir + Directory("artifacts");
 var _solutionFile = GetFiles($"{_rootDir}/*.sln").SingleOrDefault() ??
                     throw new InvalidOperationException("Did not find the solution file");
-var _nugetConfigFile = _rootDir + File("nuget.config");
 var _releaseNotesFile = _artifactsDir + File("ReleaseNotes.md");
 
 var _defaultMSBuildSettings = new DotNetCoreMSBuildSettings
@@ -218,31 +217,22 @@ Task("Push")
     .WithCriteria(!string.IsNullOrEmpty(_nugetFeed), "NuGet feed not specified")
     .Does(() =>
 {
-    var sourceName = new Uri(_nugetFeed).Host.Replace("www.", string.Empty);
+    Info($"Pushing package(s) in {_artifactsDir} to {_nugetFeed}");
 
-    Info($"Pushing package(s) in {_artifactsDir} to {sourceName}");
+    var tempConfig = new TemporaryNuGetConfig(
+        _nugetFeed,
+        _nugetUserName,
+        _nugetApiKey,
+        Context);
 
-    var tempSource = !string.IsNullOrEmpty(_nugetUserName)
-        ? new TemporaryNuGetSource(
-            sourceName,
-            _nugetFeed,
-            _nugetUserName,
-            _nugetApiKey,
-            _nugetConfigFile,
-            Context)
-        : null;
-
-    try
+    using (tempConfig)
     {
         NuGetPush(GetFiles($"{_artifactsDir}/*.nupkg"), new NuGetPushSettings
         {
             Source = _nugetFeed,
-            ApiKey = _nugetApiKey
+            ApiKey = _nugetApiKey,
+            ConfigFile = tempConfig.Path
         });
-    }
-    finally
-    {
-        tempSource?.Dispose();
     }
 });
 
@@ -336,38 +326,65 @@ private string GetBuildName(string version, int buildNumber, bool isMasterBuild)
         ? $"{version} (Build #{buildNumber})"
         : version;
 
-internal class TemporaryNuGetSource : IDisposable
+internal class TemporaryNuGetConfig : IDisposable
 {
-    private readonly string _sourceName;
     private readonly string _nugetFeed;
     private readonly string _nugetUserName;
     private readonly string _nugetApiKey;
-    private readonly FilePath _nugetConfigFile;
     private readonly ICakeContext _context;
+    private readonly FilePath _nugetConfigFile;
 
-    public TemporaryNuGetSource(
-        string sourceName,
+    public TemporaryNuGetConfig(
         string nugetFeed,
         string nugetUserName,
         string nugetApiKey,
-        FilePath nugetConfigFile,
         ICakeContext context)
     {
-        _sourceName = sourceName + "_tmp";
         _nugetFeed = nugetFeed;
         _nugetUserName = nugetUserName;
         _nugetApiKey = nugetApiKey;
-        _nugetConfigFile = nugetConfigFile;
         _context = context;
+        _nugetConfigFile = context.MakeAbsolute(context.File("nuget.config"));
+
+        CreateConfig();
+    }
+
+    public FilePath Path => _nugetConfigFile;
+
+    private void CreateConfig()
+    {
+        _context.Information($"Creating temporary NuGet config file {_nugetConfigFile}");
+
+        var exitCode = _context.StartProcess(
+            "dotnet",
+            new ProcessSettings { WorkingDirectory = _context.Environment.WorkingDirectory, Silent = true }
+                .WithArguments(args => args
+                    .Append("new")
+                    .Append("nugetconfig")));
+
+        if (exitCode != 0)
+        {
+            throw new Exception($"Failed to create new nuget config (Exit code: {exitCode}");
+        }
+
+        _context.NuGetRemoveSource(
+            "nuget",
+            "https://api.nuget.org/v3/index.json",
+            new NuGetSourcesSettings
+            {
+                ConfigFile = _nugetConfigFile
+            });
 
         AddSource();
     }
 
     private void AddSource()
     {
-        _context.Information($"Adding temporary NuGet source {_sourceName} with basic auth");
+        var sourceName = new Uri(_nugetFeed).Host.Replace("www.", string.Empty);
 
-        _context.NuGetAddSource(_sourceName, _nugetFeed, new NuGetSourcesSettings
+        _context.Information($"Adding NuGet source {sourceName}");
+
+        _context.NuGetAddSource(sourceName, _nugetFeed, new NuGetSourcesSettings
         {
             UserName = _nugetUserName,
             Password = _nugetApiKey,
@@ -377,16 +394,13 @@ internal class TemporaryNuGetSource : IDisposable
         _context.Information(string.Empty);
     }
 
-    private void RemoveSource()
+    private void RemoveConfig()
     {
         _context.Information(string.Empty);
-        _context.Information($"Removing temporary NuGet source {_sourceName}");
+        _context.Information($"Removing temporary NuGet config file {_nugetConfigFile}");
 
-        _context.NuGetRemoveSource(_sourceName, _nugetFeed, new NuGetSourcesSettings
-        {
-            ConfigFile = _nugetConfigFile
-        });
+        _context.DeleteFile(_nugetConfigFile);
     }
 
-    public void Dispose() => RemoveSource();
+    public void Dispose() => RemoveConfig();
 }
