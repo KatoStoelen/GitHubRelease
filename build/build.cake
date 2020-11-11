@@ -110,6 +110,25 @@ Task("Build")
     });
 });
 
+Task("Publish-CakeExtension")
+    .Does(() =>
+{
+    var cakeExtensionProject =
+        _srcDir +
+        Directory("GitHubRelease.Cake") +
+        File("GitHubRelease.Cake.csproj");
+
+    Info($"Publishing {cakeExtensionProject}");
+
+    DotNetCorePublish(cakeExtensionProject, new DotNetCorePublishSettings
+    {
+        Configuration = _configuration,
+        NoRestore = true,
+        NoBuild = true,
+        MSBuildSettings = _defaultMSBuildSettings
+    });
+});
+
 Task("Test")
     .IsDependentOn("Build")
     .Does(() =>
@@ -161,6 +180,7 @@ Task("Clean-Artifacts")
 
 Task("Pack")
     .IsDependentOn("Build")
+    .IsDependentOn("Publish-CakeExtension")
     .IsDependentOn("Clean-Artifacts")
     .Does(() =>
 {
