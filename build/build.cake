@@ -1,5 +1,6 @@
 #tool "nuget:?package=GitVersion.CommandLine&version=5.3.7"
 #addin "nuget:?package=Cake.Git&version=0.22.0"
+#addin "nuget:?package=KatoStoelen.GitHubRelease.Cake&version=1.0.0-beta.2&prerelease"
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -184,6 +185,20 @@ Task("Pack")
     .IsDependentOn("Clean-Artifacts")
     .Does(() =>
 {
+    var releaseNotes = "(none)";
+
+    if (!string.IsNullOrWhiteSpace(_gitHubPat))
+    {
+        Info("Creating package release notes");
+
+        releaseNotes = GetReleaseNotes(new ReleaseNotesSettings
+        {
+            RepositoryRootDirectory = _rootDir,
+            GitHubToken = _gitHubPat,
+            Format = ReleaseNotesFormat.PlainText
+        });
+    }
+
     Info($"Packing project(s) in solution {_solutionFile}");
 
     DotNetCorePack(_solutionFile.FullPath, new DotNetCorePackSettings
@@ -193,6 +208,7 @@ Task("Pack")
         NoRestore = true,
         NoBuild = true,
         MSBuildSettings = _defaultMSBuildSettings
+            .WithProperty("PackageReleaseNotes", releaseNotes)
     });
 });
 
